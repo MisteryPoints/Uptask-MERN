@@ -1,0 +1,28 @@
+{
+  "name": "uptask-mern",
+  "version": "1.0.0",
+  "description": "Uptask MERN",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MisteryPoints/Uptask-MERN.git"
+  },
+  "author": "DevPoint",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MisteryPoints/Uptask-MERN/issues"
+  },
+  "homepage": "https://github.com/MisteryPoints/Uptask-MERN#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "mongoose": "^6.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
