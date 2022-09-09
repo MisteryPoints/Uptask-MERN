@@ -73,7 +73,7 @@ const confirmar = async (req, res) => {
 const forgotPassword = async (req, res) => {
     const { email } = req.body
     const usuario = await Usuario.findOne({ email })
-    if(!usuario){
+    if(!usuario) {
         const error = new Error('El Usuario no existe')
         return res.status(404).json({ msg: error.message })
     }
@@ -87,9 +87,43 @@ const forgotPassword = async (req, res) => {
     }
 }
 
+const comprobarToken = async (req, res) => {
+    const { token } = req.params
+    const tokenValido = await Usuario.findOne({ token })
+
+    if(tokenValido) {
+        res.json({ msg: 'Token Valido y el Usuario Existe' })
+    } else {
+        const error = new Error('Token no Válido')
+        return res.status(404).json({ msg: error.message })
+    }
+}
+
+const nuevoPassword = async (req, res) => {
+    const { token } = req.params
+    const { password } = req.body
+    const usuario = await Usuario.findOne({ token })
+    if(usuario) {
+        usuario.password = password
+        usuario.token = ''
+        await usuario.save()
+        res.json({ msg: 'Password Modificado Correctamente' })
+    } else {
+        const error = new Error('Token no Válido')
+        return res.status(404).json({ msg: error.message })
+    }
+}
+
+const perfil = async (req, res) => {
+    console.log('desde perfil')
+}
+
 export { 
     registrar,
     autenticar,
     confirmar,
-    forgotPassword
+    forgotPassword,
+    comprobarToken,
+    nuevoPassword,
+    perfil
 }
