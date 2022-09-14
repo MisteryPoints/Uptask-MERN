@@ -19,8 +19,47 @@ const agregarTarea = async (req, res) => {
         console.log(error)
     } 
 }
-const obtenerTarea = async (req, res) => {}
-const actualizarTarea = async (req, res) => {}
+const obtenerTarea = async (req, res) => {
+    const { id } = req.params
+    const tarea = await Tarea.findById(id)
+    const { proyecto } = tarea 
+    const existeProyecto = await Proyecto.findById(proyecto)
+    if(!tarea){
+        const error = new Error('La tarea no fué encontrada')
+        return res.status(404).json({msg: error.message})
+    }
+    if (existeProyecto.creador.toString() !== req.usuario._id.toString()){ 
+        const error = new Error('Acción no Valida')
+        return res.status(401).json({msg: error.message})
+    }  
+    res.json(tarea) 
+}
+
+const actualizarTarea = async (req, res) => { 
+    const { id } = req.params
+    const tarea = await Tarea.findById(id)
+    const { proyecto } = tarea 
+    const existeProyecto = await Proyecto.findById(proyecto)
+    if(!tarea){
+        const error = new Error('La tarea no fué encontrada')
+        return res.status(404).json({msg: error.message})
+    }
+    if (existeProyecto.creador.toString() !== req.usuario._id.toString()){ 
+        const error = new Error('Acción no Valida')
+        return res.status(401).json({msg: error.message})
+    }  
+
+    tarea.nombre = req.body.nombre || tarea.nombre
+    tarea.descripcion = req.body.descripcion || tarea.descripcion
+    tarea.prioridad = req.body.prioridad || tarea.prioridad
+    tarea.fechaEntrega = req.body.fechaEntrega || tarea.fechaEntrega
+
+    try {
+        const tareaAlmacenada = await tarea.save()
+    } catch (error) {
+        console.log(error)
+    }
+}
 const eliminarTarea = async (req, res) => {}
 const cambiarEstado = async (req, res) => {}
 
