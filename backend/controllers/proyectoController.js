@@ -1,4 +1,5 @@
 import Proyecto from "../models/Proyecto.js"
+import Tarea from "../models/Tareas.js"
 
 const obtenerProyectos = async (req, res) => { 
     const proyectos = await Proyecto.find().where('creador').equals(req.usuario)
@@ -24,7 +25,9 @@ const obtenerProyecto = async (req, res) => {
             const error = new Error('Acción no valida')
             return res.status(401).json({ msg: error.message })
         }
-        return res.json(proyecto) 
+        //Obtener las Tareas del Proyecto
+        const tareas = await Tarea.find().where('proyecto').equals(proyecto._id) 
+        res.json({ proyecto, tareas }) 
     } catch { 
         const error = new Error('Proyecto no Encontrado')
         return res.status(404).json({ msg: error.message })
@@ -82,11 +85,7 @@ const agregarColaborador = async (req, res) => {
 
 const eliminarColaborador = async (req, res) => {
 
-}
-
-const obtenerTareas = async (req, res) => {
-
-}
+} 
 
 export {
     obtenerProyectos,
@@ -95,6 +94,5 @@ export {
     editarProyecto,
     eliminarProyecto,
     agregarColaborador,
-    eliminarColaborador,
-    obtenerTareas
+    eliminarColaborador 
 }
