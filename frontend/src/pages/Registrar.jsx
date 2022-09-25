@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import Alert from "../components/Alert"
-import axios from 'axios'
+import Alert from "../components/Alert" 
+import axiosClient from "../config/axiosClient"
 
 const Registrar = () => {
   const [nombre, setNombre] = useState('')
@@ -36,7 +36,7 @@ const Registrar = () => {
     setAlert({})
     // Crear usuario en la API
     try { 
-      const { data } = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/usuarios`, {nombre, email, password})
+      const { data } = await axiosClient.post(`/usuarios`, {nombre, email, password})
       
       setAlert({
         msg: data.msg,
@@ -83,7 +83,7 @@ const Registrar = () => {
         <input type="submit" value="Crear Cuenta" className="bg-sky-700 w-full mb-5 py-3 font-bold text-white uppercase rounded-lg border cursor-pointer hover:bg-sky-800 transition-all duration-300" />
       </form>
       <nav className="lg:flex lg:justify-between">
-      <Link to="/" className="block text-center my-5 text-slate-500 uppercase text-sm">¿Ya tienes una cuenta? Inicia Sesión</Link>
+        <Link to="/" className="block text-center my-5 text-slate-500 uppercase text-sm">¿Ya tienes una cuenta? Inicia Sesión</Link>
         <Link to="/forgot-password" className="block text-center my-5 text-slate-500 uppercase text-sm">Olvide mi Password</Link>
       </nav>
     </>
