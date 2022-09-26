@@ -5,6 +5,8 @@ import Registrar from './pages/Registrar'
 import ForgotPassword from './pages/ForgotPassword'
 import NewPassword from './pages/NewPassword'
 import ConfirmarCuenta from './pages/ConfirmarCuenta'
+import SecureRoute from './layout/SecureRoute'
+import Proyectos from './pages/Proyectos'
 import { AuthProvider } from '../context/AuthProvider'
 
 function App() { 
@@ -19,6 +21,9 @@ function App() {
             <Route path="forgot-password" element={<ForgotPassword/>}/>
             <Route path="forgot-password/:token" element={<NewPassword/>}/>
             <Route path="confirmar/:id" element={<ConfirmarCuenta/>}/>
+          </Route>
+          <Route path="/proyectos" element={<SecureRoute/>}>
+            <Route index element={<Proyectos/>} />
           </Route>
         </Routes>
       </AuthProvider> 

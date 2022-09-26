@@ -10,8 +10,11 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const [alerta, setAlerta] = useState({})
 
-  const { setAuth } = useAuth() 
+  const { auth, setAuth, loading } = useAuth() 
  
+  console.log(auth)
+  console.log(loading)
+
   const handleSubmit = async e => {
     e.preventDefault()
 
