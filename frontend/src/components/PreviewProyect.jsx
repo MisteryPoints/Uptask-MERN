@@ -5,9 +5,9 @@ const PreviewProyect = ({proyecto}) => {
   return (
     <div className='border-b p-5 flex'>
 
-      <p className='flex-1'>{nombre} 
+      <p className='flex-1 select-none'>{nombre} 
       <span className='text-sm text-gray-500 uppercase'>
-        {''}{cliente}
+        {' '}{cliente}
       </span></p>
       <Link to={`${_id}`} className='text-gray-600 hover:text-gray-800 uppercase text-sm font-bold'>Ver Proyecto</Link>
     </div>

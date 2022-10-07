@@ -29,10 +29,11 @@ const AuthProvider = ({children}) => {
             try {
                 const { data } = await axiosClient(`/usuarios/perfil`, config)
                 setAuth(data)
-                navigate('/proyectos')
+                if(location.pathname !== '/' || !auth) return
+                navigate('/proyectos')  
             } catch (error) {
                 setAuth({})
-            } finally {
+            } finally { 
                 setLoading(false)
             }
         }

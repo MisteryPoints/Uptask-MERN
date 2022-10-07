@@ -19,7 +19,7 @@ const SecureRoute = () => {
                     </div>
                     
                 </div>
-            ) : <Navigate to='/'/>}
+            ) : <Navigate to='/'/> }
         </>
     )
 }
