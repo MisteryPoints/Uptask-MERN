@@ -8,6 +8,7 @@ import ConfirmarCuenta from './pages/ConfirmarCuenta'
 import SecureRoute from './layout/SecureRoute'
 import Proyectos from './pages/Proyectos'
 import NuevoProyecto from './pages/NuevoProyecto'
+import NuevoColaborador from './pages/NuevoColaborador'
 import Proyecto from './pages/Proyecto'
 import EditarProyecto from './pages/EditarProyecto'
 import { AuthProvider } from './context/AuthProvider'
@@ -30,6 +31,7 @@ function App() {
             <Route path="/proyectos" element={<SecureRoute/>}>
               <Route index element={<Proyectos/>} />
               <Route path="crear-proyecto" element={<NuevoProyecto/>} />
+              <Route path="nuevo-colaborador/:id" element={<NuevoColaborador/>} />
               <Route path=":id" element={<Proyecto/>} />
               <Route path="editar/:id" element={<EditarProyecto/>} />
             </Route>

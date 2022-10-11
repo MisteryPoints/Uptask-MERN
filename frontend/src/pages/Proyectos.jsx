@@ -4,7 +4,7 @@ import PreviewProyect from "../components/PreviewProyect"
 const Proyectos = () => {
 
   const { proyectos, loading } = useProyectos() 
-   
+    
 
   if(loading) return (
     <button type="button" className="bg-sky-600 inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-white   hover:bg-sky-400 transition ease-in-out duration-150 cursor-not-allowed" disabled>
