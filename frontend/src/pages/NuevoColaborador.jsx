@@ -6,12 +6,14 @@ import Alert from "../components/Alert"
 
 const NuevoColaborador = () => {
 
-    const { obtenerProyecto, proyecto, loading, colaborador, agregarColaborador, alerta } = useProyectos()
+    const { obtenerProyecto, proyecto, loading, colaborador, agregarColaborador, alerta, showAlert } = useProyectos()
 
     const params = useParams()
 
     useEffect(() => {
         obtenerProyecto(params.id)
+        if(colaborador == {}) return
+        showAlert({})
     }, []) 
      
     

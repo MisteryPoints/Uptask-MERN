@@ -131,6 +131,7 @@ const ProyectProvider = ({children}) => {
 
             const { data } = await axiosClient(`/proyectos/${id}`, config)
             setProyecto(data.proyecto)
+            setAlerta({})
         } catch (error) {
             showAlert({
                 msg: error.response.data.msg,
@@ -371,11 +372,16 @@ const ProyectProvider = ({children}) => {
             setModalEliminarColaborador(false)
  
         } catch (error) {
-            showAlert({
+            setAlerta({
                 msg: error.response.data.msg,
                 error: true
             })
+            setModalEliminarColaborador(false)
         } 
+    }
+
+    const statusTarea = async id => {
+        console.log(id)
     }
  
     return (    
@@ -402,7 +408,8 @@ const ProyectProvider = ({children}) => {
             agregarColaborador,
             modalEliminarColaborador,
             handleEliminarColaborador,
-            eliminarColaborador
+            eliminarColaborador,
+            statusTarea
         }}>{children} </ProyectContext.Provider>
     )
 }
