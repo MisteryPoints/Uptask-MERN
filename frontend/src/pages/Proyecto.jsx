@@ -33,8 +33,7 @@ const Proyecto = () => {
                 </svg>
                 Cargando...
           </button>
-      ) : (
-        msg && alerta.error ? <Alert alert={alerta}/> : (
+      ) :  (
             <>
                 <div className='flex justify-between'>
                     <h1 className='font-black text-4xl select-none'>{nombre}</h1>
@@ -59,14 +58,7 @@ const Proyecto = () => {
 
                 Nueva Tarea</button>
             )}
-                <p className="font-bold text-xl mt-10">Tareas del Proyecto</p>
-
-                <div className='flex justify-center '>
-                    <div className='w-full md:w-1/3 lg:w-1/4'>
-                        {msg && <Alert alert={alerta}/>}
-                    </div>
-                </div>
-
+                <p className="font-bold text-xl mt-10">Tareas del Proyecto</p> 
                 <div className="bg-white shadow mt-10 rounded-lg">
                     {proyecto.tareas?.length ? proyecto.tareas?.map(
                             tarea => (<Tarea key={tarea._id} tarea={tarea}/>)
@@ -99,8 +91,8 @@ const Proyecto = () => {
             </>
             )}
             </>
-        ))
-    )
+        )
+    ) 
 }
 
 export default Proyecto

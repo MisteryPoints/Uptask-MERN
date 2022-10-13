@@ -13,9 +13,7 @@ const Login = () => {
   const navigate = useNavigate()
 
   const { auth, setAuth, loading } = useAuth() 
- 
-  console.log(auth)
-  console.log(loading)
+  
 
   const handleSubmit = async e => {
     e.preventDefault()

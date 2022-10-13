@@ -27,10 +27,8 @@ const obtenerProyecto = async (req, res) => {
     const { id } = req.params 
     try { 
         const proyecto = await Proyecto.findById(id).populate('tareas').populate('colaboradores', 'nombre email')
-
-
-
-        if(proyecto.creador.toString() !== req.usuario._id.toString() && !proyecto.colaboradores.some( colaborador => colaborador._id.toString() ) === req.usuario._id.toString()){
+ 
+        if(proyecto.creador.toString() !== req.usuario._id.toString() && !proyecto.colaboradores.some( colaborador => colaborador._id.toString() === req.usuario._id.toString())){ 
             const error = new Error('Acción no valida')
             return res.status(401).json({ msg: error.message })
         }

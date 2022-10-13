@@ -25,8 +25,8 @@ const ProyectProvider = ({children}) => {
 
     useEffect(() => {
         const obtenerProyectos = async () => {
+            setLoading(true)
             try { 
-                setLoading(true)
                 await timeout(1800) 
                 const token = localStorage.getItem('token')
                 if(!token)  return 
@@ -40,8 +40,9 @@ const ProyectProvider = ({children}) => {
                 setProyectos(data) 
             } catch (error) {
                 console.log(error)
-            } 
-            setLoading(false)
+            } finally{ 
+                setLoading(false)
+            }
         }
         obtenerProyectos()
     }, [])
@@ -132,13 +133,13 @@ const ProyectProvider = ({children}) => {
             const { data } = await axiosClient(`/proyectos/${id}`, config)
             setProyecto(data.proyecto)
             setAlerta({})
+            setLoading(false)
         } catch (error) {
+            navigate('/proyectos')
             showAlert({
                 msg: error.response.data.msg,
                 error: true
-            })
-        } finally {
-            setLoading(false)
+            }) 
         }
     }
 
@@ -381,7 +382,27 @@ const ProyectProvider = ({children}) => {
     }
 
     const statusTarea = async id => {
-        console.log(id)
+        try {
+            const token = localStorage.getItem('token')
+            if(!token) return
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const { data } = await axiosClient.post(`tareas/estado/${id}`, {}, config)
+            const proyectoActualizado = {...proyecto}
+            proyectoActualizado.tareas = proyectoActualizado.tareas.map(tareaState => tareaState._id === data._id ? data : tareaState)
+
+            setProyecto(proyectoActualizado)
+            setTarea({})
+            setAlerta({})
+
+        } catch (error) {
+            console.log(error.response)
+        }
     }
  
     return (    
