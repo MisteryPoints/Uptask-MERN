@@ -43,7 +43,7 @@ const obtenerTarea = async (req, res) => {
 const actualizarTarea = async (req, res) => { 
     const { id } = req.params
     try {
-        const tarea = await Tarea.findById(id)
+        const tarea = await Tarea.findById(id).populate("proyecto")
         const { proyecto } = tarea 
         const existeProyecto = await Proyecto.findById(proyecto) 
         if (existeProyecto.creador.toString() !== req.usuario._id.toString()){ 
@@ -93,9 +93,12 @@ const eliminarTarea = async (req, res) => {
         return res.status(404).json({msg: error.message})
     } 
 }
+
+
 const cambiarEstado = async (req, res) => {
     const { id } = req.params 
     const tarea = await Tarea.findById(id).populate("proyecto")
+     
     if(!tarea){
         const error = new Error('La Tarea no fué encontrada')
         return res.status(404).json({msg: error.message}) 
@@ -107,8 +110,12 @@ const cambiarEstado = async (req, res) => {
     } 
 
     tarea.estado = !tarea.estado
+    tarea.completado = req.usuario._id
     await tarea.save()
-    res.json(tarea)
+
+    const tareaAlmacenada = await Tarea.findById(id).populate("proyecto").populate("completado")
+
+    res.json(tareaAlmacenada)
 }
 
 export {

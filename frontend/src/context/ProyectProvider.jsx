@@ -1,11 +1,13 @@
 import { useState, useEffect, createContext } from 'react'
 import axiosClient from '../config/axiosClient'
 import { useNavigate, useParams } from 'react-router-dom'
-import axios from 'axios'
+import io from 'socket.io-client'
+
+let socket
 
 const ProyectContext = createContext()
 
-const ProyectProvider = ({children}) => {
+const ProyectProvider = ({children}) => { 
 
     const [proyectos, setProyectos] = useState([])
     const [alerta, setAlerta] = useState({})
@@ -16,35 +18,12 @@ const ProyectProvider = ({children}) => {
     const [modalEliminarTarea, setModalEliminarTarea] = useState(false)
     const [colaborador, setColaborador] = useState({})
     const [modalEliminarColaborador, setModalEliminarColaborador] = useState(false)
+    const [buscador, setBuscador] = useState(false)
 
-    const navigate = useNavigate()
-
-    function timeout(delay) {
-        return new Promise( res => setTimeout(res, delay) )
-    }
+    const navigate = useNavigate()  
 
     useEffect(() => {
-        const obtenerProyectos = async () => {
-            setLoading(true)
-            try { 
-                await timeout(1800) 
-                const token = localStorage.getItem('token')
-                if(!token)  return 
-                const config = {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
-                    }
-                } 
-                const { data } = await axiosClient('/proyectos', config)
-                setProyectos(data) 
-            } catch (error) {
-                console.log(error)
-            } finally{ 
-                setLoading(false)
-            }
-        }
-        obtenerProyectos()
+        socket = io(import.meta.env.VITE_BACKEND_URL)
     }, [])
 
     const showAlert = alerta => { 
@@ -53,6 +32,25 @@ const ProyectProvider = ({children}) => {
             setAlerta({})
         }, 5000);
     } 
+    
+    const obtenerProyectos = async () => {
+        setLoading(true)
+        try { 
+            const token = localStorage.getItem('token')
+            if(!token)  return 
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            } 
+            const { data } = await axiosClient('/proyectos', config)
+            setProyectos(data) 
+            setLoading(false)
+        } catch (error) {
+            console.log(error)
+        }  
+    }
 
     const editarProyecto = async proyecto => {
         try {
@@ -205,12 +203,12 @@ const ProyectProvider = ({children}) => {
 
             const { data } = await axiosClient.post('/tareas', tarea, config) 
 
-            //Agregar Tareas al State
-            const proyectoActualizado = { ...proyecto }
-            proyectoActualizado.tareas = [...proyecto.tareas, data]
-            setProyecto(proyectoActualizado)
+            
             setAlerta({})
             setModalFormTarea(false)
+
+            //Socket.io
+            socket.emit('nueva tarea', data)
         } catch (error) {
             console.log(error)
         }
@@ -230,13 +228,14 @@ const ProyectProvider = ({children}) => {
 
             const { data } = await axiosClient.put(`/tareas/${tarea.id}`, tarea, config)
 
-            //Actualizar el DOM
-            const proyectoActualizado = { ...proyecto }
-            proyectoActualizado.tareas = proyectoActualizado.tareas.map( tareaState => tareaState._id === data._id ? data : tareaState)
-            setProyecto(proyectoActualizado)
 
             setAlerta({})
             setModalFormTarea(false)
+
+            //Socket.io
+            socket.emit('editar tarea', data)
+
+            
         } catch (error) {
             console.log(error)
         }
@@ -270,15 +269,17 @@ const ProyectProvider = ({children}) => {
                 msg: data.msg,
                 error: false
             })
-            //Actualizar el DOM
-            const proyectoActualizado = { ...proyecto } 
-            proyectoActualizado.tareas = proyectoActualizado.tareas.filter(tareaState => tareaState._id !== tarea._id)
-            setProyecto(proyectoActualizado)
+            
             setModalEliminarTarea(false)
+
+            //Socket.io
+            socket.emit('eliminar tarea', tarea) 
+
             setTarea({})
             setTimeout(() => {
                 setAlerta({})
-            }, 3000);
+            }, 3000)
+
         } catch (error) {
             console.log(error)
         }
@@ -393,26 +394,70 @@ const ProyectProvider = ({children}) => {
                 }
             }
             const { data } = await axiosClient.post(`tareas/estado/${id}`, {}, config)
-            const proyectoActualizado = {...proyecto}
-            proyectoActualizado.tareas = proyectoActualizado.tareas.map(tareaState => tareaState._id === data._id ? data : tareaState)
-
-            setProyecto(proyectoActualizado)
+            
+ 
             setTarea({})
             setAlerta({})
+
+            //Socket.io
+            
+            socket.emit('estado tarea', data)
 
         } catch (error) {
             console.log(error.response)
         }
+    }
+
+    const handleBuscador = () => {
+        setBuscador(!buscador)
+    }
+
+    // Socket.io
+    const submitTareasProyecto = tarea => {
+        //Agregar Tareas al State
+        const proyectoActualizado = { ...proyecto }
+        proyectoActualizado.tareas = [...proyectoActualizado.tareas, tarea]
+        setProyecto(proyectoActualizado)
+    }
+
+    const eliminarTareaProyecto = tarea => {
+        //Actualizar el DOM
+        const proyectoActualizado = { ...proyecto } 
+        proyectoActualizado.tareas = proyectoActualizado.tareas.filter(tareaState => tareaState._id !== tarea._id)
+        setProyecto(proyectoActualizado)
+    }
+
+    const editarTareaProyecto = tarea => {
+        //Actualizar el DOM
+        const proyectoActualizado = { ...proyecto }
+        proyectoActualizado.tareas = proyectoActualizado.tareas.map( tareaState => tareaState._id === tarea._id ? tarea : tareaState)
+        setProyecto(proyectoActualizado)
+    }
+
+    const statusTareaProyecto = tarea => {
+        const proyectoActualizado = {...proyecto}
+        proyectoActualizado.tareas = proyectoActualizado.tareas.map(tareaState => tareaState._id === tarea._id ? tarea : tareaState)
+        setProyecto(proyectoActualizado)
+    }
+
+    //Cerrar Sesión
+    const cerrarSesionProyectos = () => {
+        setProyectos([])
+        setProyecto({})
+        setAlerta({})
+
     }
  
     return (    
         <ProyectContext.Provider value={{
             proyectos,
             showAlert,
+            obtenerProyectos,
             alerta, 
             obtenerProyecto,
             proyecto,
             loading,
+            setLoading,
             editarProyecto,
             nuevoProyecto,
             eliminarProyecto,
@@ -430,8 +475,17 @@ const ProyectProvider = ({children}) => {
             modalEliminarColaborador,
             handleEliminarColaborador,
             eliminarColaborador,
-            statusTarea
-        }}>{children} </ProyectContext.Provider>
+            statusTarea,
+            buscador,
+            handleBuscador,
+            submitTareasProyecto,
+            eliminarTareaProyecto,
+            editarTareaProyecto,
+            statusTareaProyecto,
+            cerrarSesionProyectos
+        }}>
+            {children} 
+        </ProyectContext.Provider>
     )
 }
 

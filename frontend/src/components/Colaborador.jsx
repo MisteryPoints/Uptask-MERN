@@ -8,7 +8,7 @@ const Colaborador = ({colaborador}) => {
 
     return (
         <div>
-            <div className="border-b p-5 flex justify-between items-center">
+            <div className="border-b p-5 flex justify-between items-center hover:cursor-default">
                 <div>
                     <p>{nombre}</p>
                     <p className="text-sm text-gray-700">{email}</p>

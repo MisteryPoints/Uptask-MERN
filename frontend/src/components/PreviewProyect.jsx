@@ -7,7 +7,7 @@ const PreviewProyect = ({proyecto}) => {
 
   const { nombre, _id, cliente, creador } = proyecto
   return (
-    <div className='border-b p-5 flex justify-between'>
+    <div className='border-b p-5 flex flex-col justify-between md:flex-row'>
       <div className='flex items-center gap-2'> 
         <p className='flex-1 select-none'>{nombre} 
         <span className='text-sm text-gray-500 uppercase'>
@@ -19,7 +19,7 @@ const PreviewProyect = ({proyecto}) => {
         )}
       </div>
 
-      <Link to={`${_id}`} className='text-gray-600 hover:text-gray-800 uppercase text-sm font-bold'>Ver Proyecto</Link>
+      <Link to={`${_id}`} className='text-gray-600 hover:text-gray-800 uppercase text-sm font-bold flex items-center'>Ver Proyecto</Link>
     </div>
   )
 }

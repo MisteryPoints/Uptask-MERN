@@ -1,13 +1,17 @@
+import { useEffect } from "react"
 import useProyectos from "../hooks/useProyectos"
 import PreviewProyect from "../components/PreviewProyect"
-import Alert from "../components/Alert"
+import Alert from "../components/Alert" 
 
 const Proyectos = () => {
 
-  const { proyectos, loading, alerta } = useProyectos() 
-    
+  const { proyectos, loading, obtenerProyectos, alerta } = useProyectos() 
+     
   const { msg } = alerta
  
+  useEffect(() => {
+    obtenerProyectos()
+  }, [])
 
   return ( 
     loading ? (

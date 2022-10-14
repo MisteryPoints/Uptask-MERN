@@ -4,14 +4,16 @@ import useProyectos from '../hooks/useProyectos'
 import useAdmin from '../hooks/useAdmin'
 import ModalFormularioTarea from '../components/ModalFormularioTarea'
 import ModalEliminarTarea from '../components/ModalEliminarTarea'
-import Tarea from '../components/Tarea'
-import Alert from '../components/Alert'
+import Tarea from '../components/Tarea' 
 import Colaborador from '../components/Colaborador'
 import ModalEliminarColaborador from '../components/ModalEliminarColaborador'
+import io from 'socket.io-client'
+
+let socket
 
 const Proyecto = () => {
     const params = useParams()
-    const { obtenerProyecto, proyecto, loading, handleModalTarea, alerta } = useProyectos() 
+    const { obtenerProyecto, proyecto, loading, handleModalTarea, alerta, submitTareasProyecto, eliminarTareaProyecto, editarTareaProyecto, statusTareaProyecto } = useProyectos() 
 
     const admin = useAdmin() 
 
@@ -20,8 +22,39 @@ const Proyecto = () => {
     useEffect(() => {
         obtenerProyecto(params.id)
     }, []) 
-    const { nombre } = proyecto  
 
+    useEffect(() => {
+        socket = io(import.meta.env.VITE_BACKEND_URL)
+        socket.emit('abrir proyecto', params.id)
+    }, [])
+
+    useEffect(() => { 
+        socket.on('tarea agregada', tareaNueva => {
+            if (tareaNueva.proyecto === proyecto._id){
+                submitTareasProyecto(tareaNueva)
+            }
+        })
+
+        socket.on('tarea eliminada', tareaEliminada => {
+            if (tareaEliminada.proyecto === proyecto._id){
+                eliminarTareaProyecto(tareaEliminada)
+            }
+        })
+
+        socket.on('tarea actualizada', tareaActualizada => {
+            if (tareaActualizada.proyecto._id === proyecto._id){
+                editarTareaProyecto(tareaActualizada)
+            }
+        })
+
+        socket.on('tarea status', tareaEstatus => {
+            if (tareaEstatus.proyecto._id === proyecto._id){
+                statusTareaProyecto(tareaEstatus)
+            }
+        })
+    })
+
+    const { nombre } = proyecto  
     const { msg } = alerta  
  
     return (
@@ -49,7 +82,7 @@ const Proyecto = () => {
                 )}
                 </div>
             {admin && (
-                <button type='button' className='text-sm px-5 py-3 w-full md:w-auto rounded-lg uppercase font-bold bg-sky-400 text-center text-white mt-5 hover:bg-sky-500 flex justify-between gap-2'
+                <button type='button' className='text-sm px-5 py-3 w-full md:w-auto rounded-lg uppercase font-bold bg-sky-400 text-center text-white mt-5 hover:bg-sky-500 flex sm:justify-between gap-2'
                 onClick={handleModalTarea}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                     <path fillRule="evenodd" d="M5.625 1.5H9a3.75 3.75 0 013.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 013.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 01-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875zM12.75 12a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V18a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V12z" clipRule="evenodd" />
@@ -58,18 +91,18 @@ const Proyecto = () => {
 
                 Nueva Tarea</button>
             )}
-                <p className="font-bold text-xl mt-10">Tareas del Proyecto</p> 
-                <div className="bg-white shadow mt-10 rounded-lg">
+                <p className="font-bold text-xl mt-10 hover:cursor-default">Tareas del Proyecto</p> 
+                <div className="bg-white shadow mt-10 rounded-lg ">
                     {proyecto.tareas?.length ? proyecto.tareas?.map(
                             tarea => (<Tarea key={tarea._id} tarea={tarea}/>)
                         ) : (
-                        <p className='text-center my-5 p-10'>No hay Tareas en este Proyecto</p>
+                        <p className='text-center my-5 p-10 hover:cursor-default'>No hay Tareas en este Proyecto</p>
                     )}
                 </div>
             {admin && (
             <>
                 <div className="flex items-center justify-between mt-10 "> 
-                    <p className="font-bold text-xl">Colaboradores</p>
+                    <p className="font-bold text-xl hover:cursor-default">Colaboradores</p>
                     <Link to={`/proyectos/nuevo-colaborador/${proyecto._id}`} className='text-gray-600 uppercase font-bold hover:text-black flex justify-between gap-2'> 
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
                         <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clipRule="evenodd" />
@@ -81,7 +114,7 @@ const Proyecto = () => {
                     {proyecto.colaboradores?.length ? proyecto.colaboradores?.map(
                             colaborador => (<Colaborador key={colaborador._id} colaborador={colaborador}/>)
                         ) : (
-                        <p className='text-center my-5 p-10'>No existen Colaboradores en este Proyecto</p>
+                        <p className='text-center my-5 p-10 hover:cursor-default'>No existen Colaboradores en este Proyecto</p>
                     )}
                 </div>
 
